@@ -1,5 +1,7 @@
 package com.disney.studios;
 
+import com.disney.studios.dogs.DogImg;
+import com.disney.studios.dogs.DogImgRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +51,9 @@ public class PetLoader implements InitializingBean {
         loadBreed("Yorkie", yorkies);
     }
 
+    @Autowired
+    private DogImgRepository dogImgRepository;
+
     /**
      * Reads the list of dogs in a category and (eventually) add
      * them to the data source.
@@ -64,6 +69,9 @@ public class PetLoader implements InitializingBean {
                 /* TODO: Create appropriate objects and save them to
                  *       the datasource.
                  */
+                DogImg dogImg = new DogImg();
+                dogImg.setUrl(line);
+                dogImgRepository.save(dogImg);
             }
         }
     }
