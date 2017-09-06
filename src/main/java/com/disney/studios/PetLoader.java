@@ -2,6 +2,7 @@ package com.disney.studios;
 
 import com.disney.studios.dogs.DogImg;
 import com.disney.studios.dogs.DogImgRepository;
+import com.disney.studios.dogs.DogImgService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 /**
  * Loads stored objects from the file system and builds up
@@ -52,7 +54,7 @@ public class PetLoader implements InitializingBean {
     }
 
     @Autowired
-    private DogImgRepository dogImgRepository;
+    private DogImgService dogImgService;
 
     /**
      * Reads the list of dogs in a category and (eventually) add
@@ -62,17 +64,20 @@ public class PetLoader implements InitializingBean {
      * @throws IOException In case things go horribly, horribly wrong.
      */
     private void loadBreed(String breed, Resource source) throws IOException {
+
+        ArrayList<DogImg> dogImgs = new ArrayList<>();
         try ( BufferedReader br = new BufferedReader(new InputStreamReader(source.getInputStream()))) {
             String line;
             while ((line = br.readLine()) != null) {
                 System.out.println(line);
-                /* TODO: Create appropriate objects and save them to
-                 *       the datasource.
-                 */
                 DogImg dogImg = new DogImg();
                 dogImg.setUrl(line);
-                dogImgRepository.save(dogImg);
+                dogImg.setBreed(breed);
+                dogImgs.add(dogImg);
             }
+
+            dogImgService.saveDogImgs(dogImgs);
+
         }
     }
 }

@@ -1,11 +1,14 @@
 package com.disney.studios.dogs;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(indexes = @Index(columnList = "breed"))
 public class DogImg implements Serializable {
 
     @Id
@@ -13,6 +16,17 @@ public class DogImg implements Serializable {
     private Long id;
 
     private String url;
+
+    private String breed;
+
+    public String getBreed() {
+        return breed;
+    }
+
+    public void setBreed(String breed) {
+        this.breed = breed;
+    }
+
 
     private HashSet<Vote> votes = new HashSet<>();
 
@@ -32,7 +46,7 @@ public class DogImg implements Serializable {
         this.id = id;
     }
 
-    @OneToMany(mappedBy = "dogImg")
+    @OneToMany(mappedBy = "dogImg", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     public HashSet<Vote> getVotes() {
         return votes;
     }

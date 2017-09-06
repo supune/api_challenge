@@ -4,22 +4,26 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@IdClass(VoteId.class)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames ={"dog_img_id","user"}))
 public class Vote implements Serializable{
 
-    @Id
-    long userId;
 
     @Id
-    @ManyToOne
-    DogImg dogImg;
+    @GeneratedValue
+    private long id;
 
-    public Long getUserId() {
-        return userId;
+    @Column
+    private long user;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    private DogImg dogImg;
+
+    public Long getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(Long user) {
+        this.user = user;
     }
 
     public DogImg getDogImg() {
@@ -30,11 +34,18 @@ public class Vote implements Serializable{
         this.dogImg = dogImg;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setUser(long user) {
+        this.user = user;
+    }
 }
 
-class VoteId implements Serializable{
-    DogImg dogImg;
-    Long userId;
-}
 
 

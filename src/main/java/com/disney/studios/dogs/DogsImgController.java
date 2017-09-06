@@ -1,5 +1,6 @@
 package com.disney.studios.dogs;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,10 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 @RestController
 public class DogsImgController {
 
@@ -21,11 +18,16 @@ public class DogsImgController {
     private DogImgRepository dogImgRepository;
 
     @Autowired
-    private VoteRepository voteRepository;
+    private DogImgService dogImgService;
 
     @RequestMapping(value = "/dogs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<DogImg> index(Pageable pageable) {
         return dogImgRepository.findAll(pageable);
+    }
+
+    @RequestMapping(value = "/dogs/breed/{breed}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Page<DogImg> byBreed(@PathVariable("breed") String breed, Pageable pageable) {
+        return dogImgRepository.findByBreed(breed, pageable);
     }
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -33,36 +35,28 @@ public class DogsImgController {
         return dogImgRepository.findOne(id);
     }
 
-    @RequestMapping(value = "/dog/{dogId}/vote/{userId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> upVote(@PathVariable("dogId") long dogImgId, @PathVariable("userId") long userId) {
+    @RequestMapping(value = "/dog/{dogId}/vote/{user}", method = RequestMethod.PUT)
+    public ResponseEntity<?> upVote(@PathVariable("dogId") long dogImgId, @PathVariable("user") long userId) {
 
-        DogImg dogImg = dogImgRepository.findOne(dogImgId);
-        if (dogImg == null) {
+        try {
+            dogImgService.saveVote(dogImgId, userId);
+        } catch(IllegalArgumentException badDogImgId) {
             return ResponseEntity.notFound().build();
+        } catch(ConstraintViolationException alreadyExists) {
+            return ResponseEntity.noContent().build();
         }
-
-        Vote vote = new Vote();
-        vote.setUserId(userId);
-        vote.setDogImg(dogImg);
-
-        voteRepository.save(vote);
 
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/dog/{dogId}/vote/{userId}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> downVote(@PathVariable("dogId") long dogImgId, @PathVariable("userId") long userId) {
+    @RequestMapping(value = "/dog/{dogId}/vote/{user}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> downVote(@PathVariable("dogId") long dogImgId, @PathVariable("user") long userId) {
 
-        DogImg dogImg = dogImgRepository.findOne(dogImgId);
-        if (dogImg == null) {
+        try {
+            dogImgService.deleteVote(dogImgId, userId);
+        } catch(IllegalArgumentException badDogImgId) {
             return ResponseEntity.notFound().build();
         }
-
-        Vote vote = new Vote();
-        vote.setUserId(userId);
-        vote.setDogImg(dogImg);
-
-        voteRepository.delete(vote);
 
         return ResponseEntity.ok().build();
     }
