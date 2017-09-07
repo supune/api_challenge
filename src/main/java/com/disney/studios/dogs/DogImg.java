@@ -55,5 +55,9 @@ public class DogImg implements Serializable {
         this.votes = votes;
     }
 
+    public int getVoteCount() {
+        return getVotes().size();
+    }
+
 
 }

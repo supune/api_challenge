@@ -33,8 +33,13 @@ public class DogsImgController {
     }
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DogImg getDogImg(@PathVariable("id") long id) {
-        return dogImgRepository.findOne(id);
+    public ResponseEntity<DogImg> getDogImg(@PathVariable("id") long id) {
+        DogImg found = dogImgRepository.findOne(id);
+        if(found == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(found);
     }
 
     @RequestMapping(value = "/dog/{dogId}/vote/{user}", method = RequestMethod.PUT)
