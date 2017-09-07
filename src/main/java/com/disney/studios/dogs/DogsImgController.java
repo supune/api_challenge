@@ -44,7 +44,8 @@ public class DogsImgController {
             dogImgService.saveVote(dogImgId, userId);
         } catch(IllegalArgumentException badDogImgId) {
             return ResponseEntity.notFound().build();
-        } catch(ConstraintViolationException alreadyExists) {
+        } catch(IllegalStateException alreadyExists) {
+            //in case client needs to know a vote was already cast use a different 20x
             return ResponseEntity.noContent().build();
         }
 

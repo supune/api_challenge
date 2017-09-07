@@ -31,8 +31,10 @@ public class DogImgService {
     public Vote saveVote(long dogImgId, long userId) {
 
         DogImg dogImg = dogImgRepository.findOne(dogImgId);
-
         if(dogImg == null) throw new IllegalArgumentException("dog image not found");
+
+        Vote alreadyExists = voteRepository.findOneByDogImgAndUser(dogImg, userId);
+        if(alreadyExists != null) throw new IllegalStateException("vote already exists");
 
         Vote vote = new Vote();
         vote.setDogImg(dogImg);

@@ -8,9 +8,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface DogImgRepository extends JpaRepository<DogImg, Long> {
 
-    String SELECT_STRING = "SELECT D.url as url ,D.breed as breed, count(V) as votes, D.id as id " +
+    String SELECT_STRING =
+            "SELECT D.url as url ,D.breed as breed, count(V) as votes, D.id as id " +
             "FROM DogImg D left join D.votes V ";
-    String POST_STRING = "group by D.breed, D.id order by D.breed, votes desc, id";
+    String POST_STRING =
+            "group by D.breed, D.id order by D.breed, votes desc, id";
 
     Page<DogImg> findByBreed(String breed, Pageable pageable);
 
