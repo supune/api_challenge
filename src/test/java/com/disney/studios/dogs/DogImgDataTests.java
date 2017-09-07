@@ -61,10 +61,9 @@ public class DogImgDataTests {
 
 
     @Test
-    public void getDogImagesEvenWhenNoVotes() {
+    public void testDogImagesAfterVotes() {
         DogImg savedDogImg1 = dogImgService.saveDogImg("testBreed1", "http://ad1.com");
-        DogImg savedDogImg2 = dogImgService.saveDogImg("testBreed2", "http://ad2.com");
-        DogImg savedDogImg3 = dogImgService.saveDogImg("testBreed3", "http://ad3.com");
+        DogImg savedDogImg2 = dogImgService.saveDogImg("testBreed1", "http://ad2.com");
 
         for(long l=0; l<99; l++) {
             dogImgService.saveVote(savedDogImg1.getId(), l);
@@ -72,7 +71,7 @@ public class DogImgDataTests {
 
         dogImgService.saveVote(savedDogImg2.getId(), 2L);
 
-        Page page = dogImgRepository.findWithVoteCount(new PageRequest(0,5));
+        Page page = dogImgRepository.findByBreedWithVoteCount("testBreed1", new PageRequest(0,5));
 
         Assert.assertEquals(new Long(99), ((Object[])(page.getContent().get(0)))[2]);
     }
