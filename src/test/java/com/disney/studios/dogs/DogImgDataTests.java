@@ -6,6 +6,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -64,9 +66,15 @@ public class DogImgDataTests {
         DogImg savedDogImg2 = dogImgService.saveDogImg("testBreed2", "http://ad2.com");
         DogImg savedDogImg3 = dogImgService.saveDogImg("testBreed3", "http://ad3.com");
 
-        dogImgService.saveVote(savedDogImg1.getId(), 1L);
+        for(long l=0; l<99; l++) {
+            dogImgService.saveVote(savedDogImg1.getId(), l);
+        }
 
-        Assert.assertEquals(2, voteRepository.locate().size());
+        dogImgService.saveVote(savedDogImg2.getId(), 2L);
+
+        Page page = dogImgRepository.findWithVoteCount(new PageRequest(0,5));
+
+        Assert.assertEquals(new Long(99), ((Object[])(page.getContent().get(0)))[2]);
     }
 
 

@@ -4,14 +4,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
-
-import java.util.List;
+import org.springframework.data.repository.query.Param;
 
 public interface DogImgRepository extends JpaRepository<DogImg, Long> {
 
+    String SELECT_STRING = "SELECT D.url as url ,D.breed as breed, count(V) as votes, D.id as id " +
+            "FROM DogImg D left join D.votes V ";
+    String POST_STRING = "group by D order by votes desc";
+
     Page<DogImg> findByBreed(String breed, Pageable pageable);
 
-//    @Query("SELECT D FROM DogImg D inner join D.votes")
-//    List<DogImg> locate();
+    @Query(SELECT_STRING + POST_STRING)
+    Page findWithVoteCount(Pageable page);
+
+    @Query(SELECT_STRING + "where D.breed=:breed " + POST_STRING)
+    Page findByBreedWithVoteCount(@Param("breed") String breed, Pageable pageable);
 }

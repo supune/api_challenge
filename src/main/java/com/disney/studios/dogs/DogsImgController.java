@@ -22,12 +22,14 @@ public class DogsImgController {
 
     @RequestMapping(value = "/dogs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<DogImg> index(Pageable pageable) {
-        return dogImgRepository.findAll(pageable);
+
+        //return dogImgRepository.findAll(pageable);
+        return dogImgRepository.findWithVoteCount(pageable);
     }
 
     @RequestMapping(value = "/dogs/breed/{breed}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<DogImg> byBreed(@PathVariable("breed") String breed, Pageable pageable) {
-        return dogImgRepository.findByBreed(breed, pageable);
+        return dogImgRepository.findByBreedWithVoteCount(breed, pageable); //dogImgRepository.findByBreed(breed, pageable);
     }
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

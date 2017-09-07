@@ -12,7 +12,5 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     Vote findOneByDogImgIdAndUser(long dogImgId, long user);
 
-    @Query("Select V FROM Vote V left join V.dogImg")
-    List<Vote> locate();
 
 }

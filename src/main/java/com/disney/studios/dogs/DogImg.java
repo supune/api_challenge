@@ -27,8 +27,8 @@ public class DogImg implements Serializable {
         this.breed = breed;
     }
 
-
-    private HashSet<Vote> votes = new HashSet<>();
+    @OneToMany(mappedBy = "dogImg", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private Set<Vote> votes = new HashSet<>();
 
     public String getUrl() {
         return url;
@@ -46,8 +46,8 @@ public class DogImg implements Serializable {
         this.id = id;
     }
 
-    @OneToMany(mappedBy = "dogImg", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    public HashSet<Vote> getVotes() {
+    @JsonIgnore
+    public Set<Vote> getVotes() {
         return votes;
     }
 
