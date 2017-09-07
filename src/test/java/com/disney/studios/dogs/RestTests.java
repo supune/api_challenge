@@ -1,5 +1,6 @@
 package com.disney.studios.dogs;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,12 +14,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.ArrayList;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.hamcrest.Matchers.equalTo;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+/**
+ * these are not unit tests. just functional tests as sanity checks
+ */
 public class RestTests {
 
     @Autowired
@@ -29,6 +32,9 @@ public class RestTests {
 
     @Autowired
     private DogImgRepository dogImgRepository;
+
+    @Autowired
+    private VoteRepository voteRepository;
 
     private ArrayList<DogImg> savedDogs = new ArrayList<>();
     @Before
@@ -46,10 +52,11 @@ public class RestTests {
 
         int j = 1;
         for(DogImg dogImg: savedDogs) {
-            j++;
+
             for(int k=j; k>0; k--) {
                 dogImgService.saveVote(dogImg.getId(), k);
             }
+            j++;
         }
     }
 
@@ -73,5 +80,21 @@ public class RestTests {
     }
 
 
+    @Test
+    public void testVotes() throws Exception {
+        DogImg firstDog = savedDogs.get(0);
+        mvc.perform(MockMvcRequestBuilders.put("/dog/" + firstDog.getId() + "/vote/" + 9999).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Vote fromDb = voteRepository.findOneByDogImgIdAndUser(firstDog.getId(),9999);
+
+        Assert.assertNotNull(fromDb);
+
+        mvc.perform(MockMvcRequestBuilders.delete("/dog/" + firstDog.getId() + "/vote/" + 9999).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Assert.assertNull(voteRepository.findOneByDogImgIdAndUser(firstDog.getId(),9999));
+
+    }
 
 }
